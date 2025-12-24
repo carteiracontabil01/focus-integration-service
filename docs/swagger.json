@@ -1,0 +1,764 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Microservice para integração de cadastro/consulta/edição/remoção de empresas na Focus NFe (v2).",
+        "title": "Focus Company Integration Service",
+        "contact": {},
+        "version": "0.1.0"
+    },
+    "host": "localhost:8082",
+    "basePath": "/",
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "Check the health of the service",
+                "tags": [
+                    "status"
+                ],
+                "summary": "Health check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/empresas": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/empresas (suporta cnpj, cpf, offset)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Lista empresas na Focus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CNPJ (somente números)",
+                        "name": "cnpj",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "CPF (somente números)",
+                        "name": "cpf",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Paginação (offset)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.FocusEmpresaResponse"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Proxy para Focus: POST /v2/empresas",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Cria uma nova empresa na Focus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da empresa (companies.id)",
+                        "name": "company_id",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "description": "Dados da empresa",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusEmpresaCreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusEmpresaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/empresas/{id}": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/empresas/{id}",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Consulta uma empresa por ID na Focus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da empresa na Focus",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusEmpresaResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Proxy para Focus: PUT /v2/empresas/{id}. Apenas os campos enviados serão atualizados. Se atualizar certificado com sucesso, erros antigos serão removidos.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Altera uma empresa específica na Focus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da empresa na Focus",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID da empresa no Supabase (para limpeza de erros)",
+                        "name": "company_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "ID do certificado no Supabase (para limpeza de erros)",
+                        "name": "certificate_id",
+                        "in": "query"
+                    },
+                    {
+                        "description": "Dados para atualização (campos opcionais)",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusEmpresaUpdateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusEmpresaResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Proxy para Focus: DELETE /v2/empresas/{id}",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Empresas"
+                ],
+                "summary": "Exclui uma empresa na Focus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID da empresa na Focus",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusEmpresaResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handler.HealthResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "time": {
+                    "type": "string"
+                }
+            }
+        },
+        "handler.RawPayload": {
+            "type": "object",
+            "additionalProperties": {}
+        },
+        "model.FocusEmpresaCreateRequest": {
+            "type": "object",
+            "required": [
+                "arquivo_certificado_base64",
+                "bairro",
+                "cep",
+                "cnpj",
+                "complemento",
+                "email",
+                "inscricao_municipal",
+                "logradouro",
+                "municipio",
+                "nome",
+                "nome_fantasia",
+                "numero",
+                "regime_tributario",
+                "senha_certificado",
+                "uf"
+            ],
+            "properties": {
+                "arquivo_certificado_base64": {
+                    "type": "string",
+                    "example": "MIIj4gIBAzCCI54GCSqGSIb3DQEHAaCC...ASD=="
+                },
+                "bairro": {
+                    "type": "string",
+                    "example": "Vila Isabel"
+                },
+                "cep": {
+                    "type": "integer",
+                    "example": 80210000
+                },
+                "cnpj": {
+                    "type": "string",
+                    "example": "10964044000164"
+                },
+                "complemento": {
+                    "type": "string",
+                    "example": "Loja 1"
+                },
+                "cpf_responsavel": {
+                    "type": "string",
+                    "example": "12345678901"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "test@example.com"
+                },
+                "inscricao_municipal": {
+                    "description": "Must be string to preserve leading zeros (JSON number cannot represent \"00\", \"00123\", etc.)",
+                    "type": "string",
+                    "example": "0046532"
+                },
+                "logradouro": {
+                    "type": "string",
+                    "example": "Rua João da Silva"
+                },
+                "municipio": {
+                    "type": "string",
+                    "example": "Curitiba"
+                },
+                "nome": {
+                    "type": "string",
+                    "example": "Nome da empresa Ltda"
+                },
+                "nome_fantasia": {
+                    "type": "string",
+                    "example": "Nome Fantasia"
+                },
+                "nome_responsavel": {
+                    "type": "string",
+                    "example": "Fulano de Tal"
+                },
+                "numero": {
+                    "type": "integer",
+                    "example": 153
+                },
+                "regime_tributario": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "senha_certificado": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "telefone": {
+                    "type": "string",
+                    "example": "4130333333"
+                },
+                "uf": {
+                    "type": "string",
+                    "example": "PR"
+                }
+            }
+        },
+        "model.FocusEmpresaResponse": {
+            "type": "object",
+            "properties": {
+                "bairro": {
+                    "type": "string",
+                    "example": "PARQUE DOM PEDRO II"
+                },
+                "cep": {
+                    "type": "string",
+                    "example": "13056430"
+                },
+                "certificado_cnpj": {
+                    "type": "string",
+                    "example": "61453926000127"
+                },
+                "certificado_especifico": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "certificado_valido_ate": {
+                    "description": "Certificado",
+                    "type": "string",
+                    "example": "2026-11-12T14:33:00-03:00"
+                },
+                "certificado_valido_de": {
+                    "type": "string",
+                    "example": "2025-11-12T14:33:00-03:00"
+                },
+                "client_app_id": {
+                    "type": "integer",
+                    "example": 357307
+                },
+                "cnpj": {
+                    "type": "string",
+                    "example": "61453926000127"
+                },
+                "codigo_municipio": {
+                    "type": "string",
+                    "example": "3509502"
+                },
+                "codigo_pais": {
+                    "type": "string",
+                    "example": "1058"
+                },
+                "codigo_uf": {
+                    "type": "string",
+                    "example": "35"
+                },
+                "complemento": {
+                    "type": "string",
+                    "example": "BLOCO 24 APT 04 COND RES OURO VERDE"
+                },
+                "cpf": {
+                    "type": "string",
+                    "example": "12345678901"
+                },
+                "cpf_responsavel": {
+                    "type": "string"
+                },
+                "discrimina_impostos": {
+                    "description": "Flags comuns",
+                    "type": "boolean",
+                    "example": true
+                },
+                "email": {
+                    "type": "string",
+                    "example": "andre.vi.riibeiro@gmail.com"
+                },
+                "enviar_email_destinatario": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "enviar_email_homologacao": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "habilita_csrt_nfe": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "habilita_cte": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "habilita_manifestacao": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "habilita_mdfe": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "habilita_nfce": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "habilita_nfe": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "habilita_nfse": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "id": {
+                    "description": "Campos principais + campos retornados pela Focus (exemplo real).",
+                    "type": "integer",
+                    "example": 170571
+                },
+                "inscricao_estadual": {
+                    "type": "string"
+                },
+                "inscricao_municipal": {
+                    "type": "string",
+                    "example": "10721193"
+                },
+                "logradouro": {
+                    "type": "string",
+                    "example": "COACIARA"
+                },
+                "municipio": {
+                    "type": "string",
+                    "example": "CAMPINAS"
+                },
+                "nfe_sincrono": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "nfe_sincrono_homologacao": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "nome": {
+                    "type": "string",
+                    "example": "INFINITY CODE SOLUTIONS LTDA"
+                },
+                "nome_fantasia": {
+                    "type": "string",
+                    "example": "INFINITY CODE"
+                },
+                "nome_responsavel": {
+                    "description": "Outros",
+                    "type": "string"
+                },
+                "numero": {
+                    "type": "string",
+                    "example": "1101"
+                },
+                "pais": {
+                    "type": "string",
+                    "example": "Brasil"
+                },
+                "regime_tributario": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "telefone": {
+                    "type": "string",
+                    "example": "1993675739"
+                },
+                "token_homologacao": {
+                    "type": "string",
+                    "example": "tmyEw3AL8QIEqjObIuqnbGcP7wMW961F"
+                },
+                "token_producao": {
+                    "description": "Tokens",
+                    "type": "string",
+                    "example": "mQadVh1LFN7KQNESwDFLsDBq039z273s"
+                },
+                "uf": {
+                    "type": "string",
+                    "example": "SP"
+                }
+            }
+        },
+        "model.FocusEmpresaUpdateRequest": {
+            "type": "object",
+            "properties": {
+                "arquivo_certificado_base64": {
+                    "type": "string",
+                    "example": "MIIj4gIBAzCCI54GCSqGSIb3DQEHAaCC...ASD=="
+                },
+                "bairro": {
+                    "type": "string",
+                    "example": "Vila Isabel"
+                },
+                "cep": {
+                    "type": "integer",
+                    "example": 80210000
+                },
+                "cnpj": {
+                    "type": "string",
+                    "example": "10964044000164"
+                },
+                "complemento": {
+                    "type": "string",
+                    "example": "Loja 1"
+                },
+                "cpf_responsavel": {
+                    "type": "string",
+                    "example": "12345678901"
+                },
+                "email": {
+                    "type": "string",
+                    "example": "test@example.com"
+                },
+                "habilita_cte": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "habilita_mdfe": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "habilita_nfce": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "habilita_nfe": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "habilita_nfse": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "habilita_nfsen_producao": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "inscricao_municipal": {
+                    "description": "Must be string to preserve leading zeros",
+                    "type": "string",
+                    "example": "0046532"
+                },
+                "login_responsavel": {
+                    "type": "string",
+                    "example": "usuario@example.com"
+                },
+                "logradouro": {
+                    "type": "string",
+                    "example": "Rua João da Silva"
+                },
+                "municipio": {
+                    "type": "string",
+                    "example": "Curitiba"
+                },
+                "nome": {
+                    "type": "string",
+                    "example": "Nome da empresa Ltda"
+                },
+                "nome_fantasia": {
+                    "type": "string",
+                    "example": "Nome Fantasia"
+                },
+                "nome_responsavel": {
+                    "type": "string",
+                    "example": "Fulano de Tal"
+                },
+                "numero": {
+                    "type": "integer",
+                    "example": 153
+                },
+                "proximo_numero_cte_producao": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "proximo_numero_mdfe_producao": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "proximo_numero_nfce_producao": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "proximo_numero_nfe_producao": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "proximo_numero_nfse_producao": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "proximo_numero_nfsen_producao": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "regime_tributario": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "senha_certificado": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "senha_responsavel": {
+                    "type": "string",
+                    "example": "senha123"
+                },
+                "senha_responsavel_preenchida": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "telefone": {
+                    "type": "string",
+                    "example": "4130333333"
+                },
+                "uf": {
+                    "type": "string",
+                    "example": "PR"
+                }
+            }
+        }
+    }
+}

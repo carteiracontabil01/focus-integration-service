@@ -1,0 +1,548 @@
+basePath: /
+definitions:
+  handler.HealthResponse:
+    properties:
+      status:
+        type: string
+      time:
+        type: string
+    type: object
+  handler.RawPayload:
+    additionalProperties: {}
+    type: object
+  model.FocusEmpresaCreateRequest:
+    properties:
+      arquivo_certificado_base64:
+        example: MIIj4gIBAzCCI54GCSqGSIb3DQEHAaCC...ASD==
+        type: string
+      bairro:
+        example: Vila Isabel
+        type: string
+      cep:
+        example: 80210000
+        type: integer
+      cnpj:
+        example: "10964044000164"
+        type: string
+      complemento:
+        example: Loja 1
+        type: string
+      cpf_responsavel:
+        example: "12345678901"
+        type: string
+      email:
+        example: test@example.com
+        type: string
+      inscricao_municipal:
+        description: Must be string to preserve leading zeros (JSON number cannot
+          represent "00", "00123", etc.)
+        example: "0046532"
+        type: string
+      logradouro:
+        example: Rua João da Silva
+        type: string
+      municipio:
+        example: Curitiba
+        type: string
+      nome:
+        example: Nome da empresa Ltda
+        type: string
+      nome_fantasia:
+        example: Nome Fantasia
+        type: string
+      nome_responsavel:
+        example: Fulano de Tal
+        type: string
+      numero:
+        example: 153
+        type: integer
+      regime_tributario:
+        example: 1
+        type: integer
+      senha_certificado:
+        example: "123456"
+        type: string
+      telefone:
+        example: "4130333333"
+        type: string
+      uf:
+        example: PR
+        type: string
+    required:
+    - arquivo_certificado_base64
+    - bairro
+    - cep
+    - cnpj
+    - complemento
+    - email
+    - inscricao_municipal
+    - logradouro
+    - municipio
+    - nome
+    - nome_fantasia
+    - numero
+    - regime_tributario
+    - senha_certificado
+    - uf
+    type: object
+  model.FocusEmpresaResponse:
+    properties:
+      bairro:
+        example: PARQUE DOM PEDRO II
+        type: string
+      cep:
+        example: "13056430"
+        type: string
+      certificado_cnpj:
+        example: "61453926000127"
+        type: string
+      certificado_especifico:
+        example: false
+        type: boolean
+      certificado_valido_ate:
+        description: Certificado
+        example: "2026-11-12T14:33:00-03:00"
+        type: string
+      certificado_valido_de:
+        example: "2025-11-12T14:33:00-03:00"
+        type: string
+      client_app_id:
+        example: 357307
+        type: integer
+      cnpj:
+        example: "61453926000127"
+        type: string
+      codigo_municipio:
+        example: "3509502"
+        type: string
+      codigo_pais:
+        example: "1058"
+        type: string
+      codigo_uf:
+        example: "35"
+        type: string
+      complemento:
+        example: BLOCO 24 APT 04 COND RES OURO VERDE
+        type: string
+      cpf:
+        example: "12345678901"
+        type: string
+      cpf_responsavel:
+        type: string
+      discrimina_impostos:
+        description: Flags comuns
+        example: true
+        type: boolean
+      email:
+        example: andre.vi.riibeiro@gmail.com
+        type: string
+      enviar_email_destinatario:
+        example: true
+        type: boolean
+      enviar_email_homologacao:
+        example: false
+        type: boolean
+      habilita_csrt_nfe:
+        example: true
+        type: boolean
+      habilita_cte:
+        example: false
+        type: boolean
+      habilita_manifestacao:
+        example: false
+        type: boolean
+      habilita_mdfe:
+        example: false
+        type: boolean
+      habilita_nfce:
+        example: false
+        type: boolean
+      habilita_nfe:
+        example: false
+        type: boolean
+      habilita_nfse:
+        example: false
+        type: boolean
+      id:
+        description: Campos principais + campos retornados pela Focus (exemplo real).
+        example: 170571
+        type: integer
+      inscricao_estadual:
+        type: string
+      inscricao_municipal:
+        example: "10721193"
+        type: string
+      logradouro:
+        example: COACIARA
+        type: string
+      municipio:
+        example: CAMPINAS
+        type: string
+      nfe_sincrono:
+        example: false
+        type: boolean
+      nfe_sincrono_homologacao:
+        example: false
+        type: boolean
+      nome:
+        example: INFINITY CODE SOLUTIONS LTDA
+        type: string
+      nome_fantasia:
+        example: INFINITY CODE
+        type: string
+      nome_responsavel:
+        description: Outros
+        type: string
+      numero:
+        example: "1101"
+        type: string
+      pais:
+        example: Brasil
+        type: string
+      regime_tributario:
+        example: "1"
+        type: string
+      telefone:
+        example: "1993675739"
+        type: string
+      token_homologacao:
+        example: tmyEw3AL8QIEqjObIuqnbGcP7wMW961F
+        type: string
+      token_producao:
+        description: Tokens
+        example: mQadVh1LFN7KQNESwDFLsDBq039z273s
+        type: string
+      uf:
+        example: SP
+        type: string
+    type: object
+  model.FocusEmpresaUpdateRequest:
+    properties:
+      arquivo_certificado_base64:
+        example: MIIj4gIBAzCCI54GCSqGSIb3DQEHAaCC...ASD==
+        type: string
+      bairro:
+        example: Vila Isabel
+        type: string
+      cep:
+        example: 80210000
+        type: integer
+      cnpj:
+        example: "10964044000164"
+        type: string
+      complemento:
+        example: Loja 1
+        type: string
+      cpf_responsavel:
+        example: "12345678901"
+        type: string
+      email:
+        example: test@example.com
+        type: string
+      habilita_cte:
+        example: true
+        type: boolean
+      habilita_mdfe:
+        example: true
+        type: boolean
+      habilita_nfce:
+        example: true
+        type: boolean
+      habilita_nfe:
+        example: true
+        type: boolean
+      habilita_nfse:
+        example: true
+        type: boolean
+      habilita_nfsen_producao:
+        example: true
+        type: boolean
+      inscricao_municipal:
+        description: Must be string to preserve leading zeros
+        example: "0046532"
+        type: string
+      login_responsavel:
+        example: usuario@example.com
+        type: string
+      logradouro:
+        example: Rua João da Silva
+        type: string
+      municipio:
+        example: Curitiba
+        type: string
+      nome:
+        example: Nome da empresa Ltda
+        type: string
+      nome_fantasia:
+        example: Nome Fantasia
+        type: string
+      nome_responsavel:
+        example: Fulano de Tal
+        type: string
+      numero:
+        example: 153
+        type: integer
+      proximo_numero_cte_producao:
+        example: 1
+        type: integer
+      proximo_numero_mdfe_producao:
+        example: 1
+        type: integer
+      proximo_numero_nfce_producao:
+        example: 1
+        type: integer
+      proximo_numero_nfe_producao:
+        example: 1
+        type: integer
+      proximo_numero_nfse_producao:
+        example: 1
+        type: integer
+      proximo_numero_nfsen_producao:
+        example: 1
+        type: integer
+      regime_tributario:
+        example: 1
+        type: integer
+      senha_certificado:
+        example: "123456"
+        type: string
+      senha_responsavel:
+        example: senha123
+        type: string
+      senha_responsavel_preenchida:
+        example: false
+        type: boolean
+      telefone:
+        example: "4130333333"
+        type: string
+      uf:
+        example: PR
+        type: string
+    type: object
+host: localhost:8082
+info:
+  contact: {}
+  description: Microservice para integração de cadastro/consulta/edição/remoção de
+    empresas na Focus NFe (v2).
+  title: Focus Company Integration Service
+  version: 0.1.0
+paths:
+  /health:
+    get:
+      description: Check the health of the service
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.HealthResponse'
+      summary: Health check
+      tags:
+      - status
+  /v2/empresas:
+    get:
+      description: 'Proxy para Focus: GET /v2/empresas (suporta cnpj, cpf, offset)'
+      parameters:
+      - description: CNPJ (somente números)
+        in: query
+        name: cnpj
+        type: string
+      - description: CPF (somente números)
+        in: query
+        name: cpf
+        type: string
+      - description: Paginação (offset)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.FocusEmpresaResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Lista empresas na Focus
+      tags:
+      - Empresas
+    post:
+      consumes:
+      - application/json
+      description: 'Proxy para Focus: POST /v2/empresas'
+      parameters:
+      - description: ID da empresa (companies.id)
+        in: query
+        name: company_id
+        required: true
+        type: string
+      - description: Dados da empresa
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.FocusEmpresaCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/model.FocusEmpresaResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Cria uma nova empresa na Focus
+      tags:
+      - Empresas
+  /v2/empresas/{id}:
+    delete:
+      description: 'Proxy para Focus: DELETE /v2/empresas/{id}'
+      parameters:
+      - description: ID da empresa na Focus
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FocusEmpresaResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Exclui uma empresa na Focus
+      tags:
+      - Empresas
+    get:
+      description: 'Proxy para Focus: GET /v2/empresas/{id}'
+      parameters:
+      - description: ID da empresa na Focus
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FocusEmpresaResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Consulta uma empresa por ID na Focus
+      tags:
+      - Empresas
+    put:
+      consumes:
+      - application/json
+      description: 'Proxy para Focus: PUT /v2/empresas/{id}. Apenas os campos enviados
+        serão atualizados. Se atualizar certificado com sucesso, erros antigos serão
+        removidos.'
+      parameters:
+      - description: ID da empresa na Focus
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: ID da empresa no Supabase (para limpeza de erros)
+        in: query
+        name: company_id
+        type: string
+      - description: ID do certificado no Supabase (para limpeza de erros)
+        in: query
+        name: certificate_id
+        type: string
+      - description: Dados para atualização (campos opcionais)
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/model.FocusEmpresaUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FocusEmpresaResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Altera uma empresa específica na Focus
+      tags:
+      - Empresas
+swagger: "2.0"
