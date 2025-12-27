@@ -48,6 +48,34 @@ func (c *Client) DeleteEmpresa(ctx context.Context, id string) (*http.Response, 
 	return c.do(ctx, http.MethodDelete, "/v2/empresas/"+id, "", nil)
 }
 
+func (c *Client) GetCNPJ(ctx context.Context, cnpj14 string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, "/v2/cnpjs/"+cnpj14, "", nil)
+}
+
+func (c *Client) ListMunicipios(ctx context.Context, rawQuery string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, "/v2/municipios", rawQuery, nil)
+}
+
+func (c *Client) GetMunicipio(ctx context.Context, codigoMunicipio string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, "/v2/municipios/"+codigoMunicipio, "", nil)
+}
+
+func (c *Client) ListMunicipioItensListaServico(ctx context.Context, codigoMunicipio, rawQuery string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, "/v2/municipios/"+codigoMunicipio+"/itens_lista_servico", rawQuery, nil)
+}
+
+func (c *Client) GetMunicipioItemListaServico(ctx context.Context, codigoMunicipio, codigoItem string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, "/v2/municipios/"+codigoMunicipio+"/itens_lista_servico/"+codigoItem, "", nil)
+}
+
+func (c *Client) ListMunicipioCodigosTributarios(ctx context.Context, codigoMunicipio, rawQuery string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, "/v2/municipios/"+codigoMunicipio+"/codigos_tributarios_municipio", rawQuery, nil)
+}
+
+func (c *Client) GetMunicipioCodigoTributario(ctx context.Context, codigoMunicipio, codigoTributario string) (*http.Response, error) {
+	return c.do(ctx, http.MethodGet, "/v2/municipios/"+codigoMunicipio+"/codigos_tributarios_municipio/"+codigoTributario, "", nil)
+}
+
 func (c *Client) do(ctx context.Context, method, path, rawQuery string, body []byte) (*http.Response, error) {
 	if c.baseURL == "" {
 		return nil, fmt.Errorf("FOCUS_URL não definido")

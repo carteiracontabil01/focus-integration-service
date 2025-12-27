@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/seuuser/focus-company-integration-service/internal/focus"
-	"github.com/seuuser/focus-company-integration-service/internal/model"
-	"github.com/seuuser/focus-company-integration-service/internal/supabase"
+	"github.com/seuuser/focus-integration-service/internal/focus"
+	"github.com/seuuser/focus-integration-service/internal/model"
+	"github.com/seuuser/focus-integration-service/internal/supabase"
 )
 
 // RawPayload é usado para documentar payloads grandes/variáveis da Focus (empresas).

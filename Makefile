@@ -5,6 +5,6 @@ swag:
 	swag init --dir cmd/api,internal --output docs
 
 build:
-	go build -o bin/focus-company-integration-service ./cmd/api
+	go build -o bin/focus-integration-service ./cmd/api
 
 

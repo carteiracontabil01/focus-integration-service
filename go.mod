@@ -1,4 +1,4 @@
-module github.com/seuuser/focus-company-integration-service
+module github.com/seuuser/focus-integration-service
 
 go 1.24.2
 

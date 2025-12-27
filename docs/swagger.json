@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "Microservice para integração de cadastro/consulta/edição/remoção de empresas na Focus NFe (v2).",
-        "title": "Focus Company Integration Service",
+        "title": "Focus Integration Service",
         "contact": {},
         "version": "0.1.0"
     },
@@ -21,6 +21,65 @@
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/handler.HealthResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/cnpjs/{cnpj}": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/cnpjs/{cnpj}. Informe 14 dígitos (somente números).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CNPJs"
+                ],
+                "summary": "Consulta cadastro de CNPJ",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CNPJ (14 dígitos, somente números)",
+                        "name": "cnpj",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusCnpjResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
                         }
                     }
                 }
@@ -334,6 +393,430 @@
                     }
                 }
             }
+        },
+        "/v2/municipios": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/municipios. Suporta filtros via querystring (sigla_uf, nome_municipio, nome, status_nfse, offset).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Municípios"
+                ],
+                "summary": "Lista municípios (IBGE)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sigla UF (ex: PR)",
+                        "name": "sigla_uf",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Nome exato do município (ex: Curitiba)",
+                        "name": "nome_municipio",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Trecho do nome do município",
+                        "name": "nome",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Status NFSe (ativo, fora_do_ar, pausado, em_implementacao, em_reimplementacao, inativo, nao_implementado)",
+                        "name": "status_nfse",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Paginação (offset)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.FocusMunicipioResponse"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/municipios/{codigo_municipio}": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/municipios/{codigo_municipio}.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Municípios"
+                ],
+                "summary": "Busca município por código IBGE",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Código do município (IBGE)",
+                        "name": "codigo_municipio",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.FocusMunicipioResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/municipios/{codigo_municipio}/codigos_tributarios_municipio": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/municipios/{codigo_municipio}/codigos_tributarios_municipio. Suporta filtros via querystring (codigo, descricao, offset).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Municípios - Códigos Tributários"
+                ],
+                "summary": "Lista códigos tributários municipais por município",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Código do município (IBGE)",
+                        "name": "codigo_municipio",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Trecho do código (ex: 14.)",
+                        "name": "codigo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Trecho da descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Paginação (offset)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.RawPayload"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/municipios/{codigo_municipio}/codigos_tributarios_municipio/{codigo}": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/municipios/{codigo_municipio}/codigos_tributarios_municipio/{codigo}.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Municípios - Códigos Tributários"
+                ],
+                "summary": "Busca código tributário municipal por código (município)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Código do município (IBGE)",
+                        "name": "codigo_municipio",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Código tributário municipal",
+                        "name": "codigo",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/municipios/{codigo_municipio}/itens_lista_servico": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/municipios/{codigo_municipio}/itens_lista_servico. Suporta filtros via querystring (codigo, descricao, offset).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Municípios - Itens Lista de Serviço"
+                ],
+                "summary": "Lista itens da lista de serviço por município",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Código do município (IBGE)",
+                        "name": "codigo_municipio",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Trecho do código (ex: 14.)",
+                        "name": "codigo",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Trecho da descrição",
+                        "name": "descricao",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Paginação (offset)",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/handler.RawPayload"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/municipios/{codigo_municipio}/itens_lista_servico/{codigo}": {
+            "get": {
+                "description": "Proxy para Focus: GET /v2/municipios/{codigo_municipio}/itens_lista_servico/{codigo}.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Municípios - Itens Lista de Serviço"
+                ],
+                "summary": "Busca item da lista de serviço por código (município)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Código do município (IBGE)",
+                        "name": "codigo_municipio",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Código do item (ex: 14.01)",
+                        "name": "codigo",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/handler.RawPayload"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -351,6 +834,67 @@
         "handler.RawPayload": {
             "type": "object",
             "additionalProperties": {}
+        },
+        "model.FocusCnpjEndereco": {
+            "type": "object",
+            "properties": {
+                "bairro": {
+                    "type": "string"
+                },
+                "cep": {
+                    "type": "string"
+                },
+                "codigo_ibge": {
+                    "type": "string"
+                },
+                "codigo_municipio": {
+                    "type": "string"
+                },
+                "codigo_siafi": {
+                    "type": "string"
+                },
+                "complemento": {
+                    "type": "string"
+                },
+                "logradouro": {
+                    "type": "string"
+                },
+                "nome_municipio": {
+                    "type": "string"
+                },
+                "numero": {
+                    "type": "string"
+                },
+                "uf": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.FocusCnpjResponse": {
+            "type": "object",
+            "properties": {
+                "cnae_principal": {
+                    "type": "string"
+                },
+                "cnpj": {
+                    "type": "string"
+                },
+                "endereco": {
+                    "$ref": "#/definitions/model.FocusCnpjEndereco"
+                },
+                "optante_mei": {
+                    "type": "boolean"
+                },
+                "optante_simples_nacional": {
+                    "type": "boolean"
+                },
+                "razao_social": {
+                    "type": "string"
+                },
+                "situacao_cadastral": {
+                    "type": "string"
+                }
+            }
         },
         "model.FocusEmpresaCreateRequest": {
             "type": "object",
@@ -757,6 +1301,62 @@
                 "uf": {
                     "type": "string",
                     "example": "PR"
+                }
+            }
+        },
+        "model.FocusMunicipioResponse": {
+            "type": "object",
+            "properties": {
+                "codigo_cnae_obrigatorio_nfse": {
+                    "type": "boolean"
+                },
+                "codigo_municipio": {
+                    "type": "string"
+                },
+                "codigo_tributario_municipio_obrigatorio_nfse": {
+                    "type": "boolean"
+                },
+                "cpf_cnpj_obrigatorio_nfse": {
+                    "type": "boolean"
+                },
+                "data_previsao_reimplementacao_nfse": {
+                    "type": "string"
+                },
+                "endereco_obrigatorio_nfse": {
+                    "type": "boolean"
+                },
+                "item_lista_servico_obrigatorio_nfse": {
+                    "type": "boolean"
+                },
+                "nfse_habilitada": {
+                    "type": "boolean"
+                },
+                "nome_municipio": {
+                    "type": "string"
+                },
+                "nome_uf": {
+                    "type": "string"
+                },
+                "possui_ambiente_homologacao_nfse": {
+                    "type": "boolean"
+                },
+                "possui_cancelamento_nfse": {
+                    "type": "boolean"
+                },
+                "provedor_nfse": {
+                    "type": "string"
+                },
+                "requer_certificado_nfse": {
+                    "type": "boolean"
+                },
+                "sigla_uf": {
+                    "type": "string"
+                },
+                "status_nfse": {
+                    "type": "string"
+                },
+                "ultima_emissao_nfse": {
+                    "type": "string"
                 }
             }
         }

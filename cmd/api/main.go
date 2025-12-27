@@ -7,13 +7,13 @@ import (
 	"strings"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/seuuser/focus-company-integration-service/docs"
-	"github.com/seuuser/focus-company-integration-service/internal/config"
-	"github.com/seuuser/focus-company-integration-service/internal/server"
-	"github.com/seuuser/focus-company-integration-service/internal/supabase"
+	"github.com/seuuser/focus-integration-service/docs"
+	"github.com/seuuser/focus-integration-service/internal/config"
+	"github.com/seuuser/focus-integration-service/internal/server"
+	"github.com/seuuser/focus-integration-service/internal/supabase"
 )
 
-// @title           Focus Company Integration Service
+// @title           Focus Integration Service
 // @version         0.1.0
 // @description     Microservice para integração de cadastro/consulta/edição/remoção de empresas na Focus NFe (v2).
 // @host            localhost:8082
@@ -24,7 +24,7 @@ func main() {
 
 	// sobrescreve info do Swagger (PRD deve setar SWAGGER_HOST e (opcionalmente) SWAGGER_SCHEMES)
 	// Ex:
-	// - SWAGGER_HOST=api-focus-company-integration.carteiracontabil.com
+	// - SWAGGER_HOST=api-focus-integration-service.carteiracontabil.com
 	// - SWAGGER_SCHEMES=https
 	swaggerHost := strings.TrimSpace(os.Getenv("SWAGGER_HOST"))
 	if swaggerHost == "" {

@@ -10,6 +10,46 @@ definitions:
   handler.RawPayload:
     additionalProperties: {}
     type: object
+  model.FocusCnpjEndereco:
+    properties:
+      bairro:
+        type: string
+      cep:
+        type: string
+      codigo_ibge:
+        type: string
+      codigo_municipio:
+        type: string
+      codigo_siafi:
+        type: string
+      complemento:
+        type: string
+      logradouro:
+        type: string
+      nome_municipio:
+        type: string
+      numero:
+        type: string
+      uf:
+        type: string
+    type: object
+  model.FocusCnpjResponse:
+    properties:
+      cnae_principal:
+        type: string
+      cnpj:
+        type: string
+      endereco:
+        $ref: '#/definitions/model.FocusCnpjEndereco'
+      optante_mei:
+        type: boolean
+      optante_simples_nacional:
+        type: boolean
+      razao_social:
+        type: string
+      situacao_cadastral:
+        type: string
+    type: object
   model.FocusEmpresaCreateRequest:
     properties:
       arquivo_certificado_base64:
@@ -319,12 +359,49 @@ definitions:
         example: PR
         type: string
     type: object
+  model.FocusMunicipioResponse:
+    properties:
+      codigo_cnae_obrigatorio_nfse:
+        type: boolean
+      codigo_municipio:
+        type: string
+      codigo_tributario_municipio_obrigatorio_nfse:
+        type: boolean
+      cpf_cnpj_obrigatorio_nfse:
+        type: boolean
+      data_previsao_reimplementacao_nfse:
+        type: string
+      endereco_obrigatorio_nfse:
+        type: boolean
+      item_lista_servico_obrigatorio_nfse:
+        type: boolean
+      nfse_habilitada:
+        type: boolean
+      nome_municipio:
+        type: string
+      nome_uf:
+        type: string
+      possui_ambiente_homologacao_nfse:
+        type: boolean
+      possui_cancelamento_nfse:
+        type: boolean
+      provedor_nfse:
+        type: string
+      requer_certificado_nfse:
+        type: boolean
+      sigla_uf:
+        type: string
+      status_nfse:
+        type: string
+      ultima_emissao_nfse:
+        type: string
+    type: object
 host: localhost:8082
 info:
   contact: {}
   description: Microservice para integração de cadastro/consulta/edição/remoção de
     empresas na Focus NFe (v2).
-  title: Focus Company Integration Service
+  title: Focus Integration Service
   version: 0.1.0
 paths:
   /health:
@@ -338,6 +415,46 @@ paths:
       summary: Health check
       tags:
       - status
+  /v2/cnpjs/{cnpj}:
+    get:
+      description: 'Proxy para Focus: GET /v2/cnpjs/{cnpj}. Informe 14 dígitos (somente
+        números).'
+      parameters:
+      - description: CNPJ (14 dígitos, somente números)
+        in: path
+        name: cnpj
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FocusCnpjResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Consulta cadastro de CNPJ
+      tags:
+      - CNPJs
   /v2/empresas:
     get:
       description: 'Proxy para Focus: GET /v2/empresas (suporta cnpj, cpf, offset)'
@@ -545,4 +662,289 @@ paths:
       summary: Altera uma empresa específica na Focus
       tags:
       - Empresas
+  /v2/municipios:
+    get:
+      description: 'Proxy para Focus: GET /v2/municipios. Suporta filtros via querystring
+        (sigla_uf, nome_municipio, nome, status_nfse, offset).'
+      parameters:
+      - description: 'Sigla UF (ex: PR)'
+        in: query
+        name: sigla_uf
+        type: string
+      - description: 'Nome exato do município (ex: Curitiba)'
+        in: query
+        name: nome_municipio
+        type: string
+      - description: Trecho do nome do município
+        in: query
+        name: nome
+        type: string
+      - description: Status NFSe (ativo, fora_do_ar, pausado, em_implementacao, em_reimplementacao,
+          inativo, nao_implementado)
+        in: query
+        name: status_nfse
+        type: string
+      - description: Paginação (offset)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.FocusMunicipioResponse'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Lista municípios (IBGE)
+      tags:
+      - Municípios
+  /v2/municipios/{codigo_municipio}:
+    get:
+      description: 'Proxy para Focus: GET /v2/municipios/{codigo_municipio}.'
+      parameters:
+      - description: Código do município (IBGE)
+        in: path
+        name: codigo_municipio
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.FocusMunicipioResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Busca município por código IBGE
+      tags:
+      - Municípios
+  /v2/municipios/{codigo_municipio}/codigos_tributarios_municipio:
+    get:
+      description: 'Proxy para Focus: GET /v2/municipios/{codigo_municipio}/codigos_tributarios_municipio.
+        Suporta filtros via querystring (codigo, descricao, offset).'
+      parameters:
+      - description: Código do município (IBGE)
+        in: path
+        name: codigo_municipio
+        required: true
+        type: string
+      - description: 'Trecho do código (ex: 14.)'
+        in: query
+        name: codigo
+        type: string
+      - description: Trecho da descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Paginação (offset)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.RawPayload'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Lista códigos tributários municipais por município
+      tags:
+      - Municípios - Códigos Tributários
+  /v2/municipios/{codigo_municipio}/codigos_tributarios_municipio/{codigo}:
+    get:
+      description: 'Proxy para Focus: GET /v2/municipios/{codigo_municipio}/codigos_tributarios_municipio/{codigo}.'
+      parameters:
+      - description: Código do município (IBGE)
+        in: path
+        name: codigo_municipio
+        required: true
+        type: string
+      - description: Código tributário municipal
+        in: path
+        name: codigo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Busca código tributário municipal por código (município)
+      tags:
+      - Municípios - Códigos Tributários
+  /v2/municipios/{codigo_municipio}/itens_lista_servico:
+    get:
+      description: 'Proxy para Focus: GET /v2/municipios/{codigo_municipio}/itens_lista_servico.
+        Suporta filtros via querystring (codigo, descricao, offset).'
+      parameters:
+      - description: Código do município (IBGE)
+        in: path
+        name: codigo_municipio
+        required: true
+        type: string
+      - description: 'Trecho do código (ex: 14.)'
+        in: query
+        name: codigo
+        type: string
+      - description: Trecho da descrição
+        in: query
+        name: descricao
+        type: string
+      - description: Paginação (offset)
+        in: query
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/handler.RawPayload'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Lista itens da lista de serviço por município
+      tags:
+      - Municípios - Itens Lista de Serviço
+  /v2/municipios/{codigo_municipio}/itens_lista_servico/{codigo}:
+    get:
+      description: 'Proxy para Focus: GET /v2/municipios/{codigo_municipio}/itens_lista_servico/{codigo}.'
+      parameters:
+      - description: Código do município (IBGE)
+        in: path
+        name: codigo_municipio
+        required: true
+        type: string
+      - description: 'Código do item (ex: 14.01)'
+        in: path
+        name: codigo
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/handler.RawPayload'
+      summary: Busca item da lista de serviço por código (município)
+      tags:
+      - Municípios - Itens Lista de Serviço
 swagger: "2.0"
