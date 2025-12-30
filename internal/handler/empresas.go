@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"bytes"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/seuuser/focus-integration-service/internal/focus"
@@ -159,12 +160,16 @@ func (h *EmpresasHandler) CreateEmpresa(w http.ResponseWriter, r *http.Request) 
 	if focusResp.CertificadoValidoAte != "" {
 		if t, err := time.Parse(time.RFC3339, focusResp.CertificadoValidoAte); err == nil {
 			expDate = &t
+		} else {
+			log.Printf("[focus] warning: failed to parse certificado_valido_ate=%q as RFC3339: %v", focusResp.CertificadoValidoAte, err)
 		}
 	}
 	var effDate *time.Time
 	if focusResp.CertificadoValidoDe != "" {
 		if t, err := time.Parse(time.RFC3339, focusResp.CertificadoValidoDe); err == nil {
 			effDate = &t
+		} else {
+			log.Printf("[focus] warning: failed to parse certificado_valido_de=%q as RFC3339: %v", focusResp.CertificadoValidoDe, err)
 		}
 	}
 
@@ -187,6 +192,8 @@ func (h *EmpresasHandler) CreateEmpresa(w http.ResponseWriter, r *http.Request) 
 				warn = "Cadastro realizado na Focus, mas não foi possível atualizar as datas do certificado no Supabase."
 			}
 			log.Printf("[supabase] update certificates_access dates failed: %v", err)
+		} else {
+			log.Printf("[supabase] certificate dates updated (company_id=%s, effective_date=%v, expiration_date=%v)", companyID, effDate, expDate)
 		}
 		
 		// Remove erros antigos do certificado (se houver) após sucesso
@@ -334,7 +341,50 @@ func (h *EmpresasHandler) UpdateEmpresa(w http.ResponseWriter, r *http.Request) 
 	}
 	defer resp.Body.Close()
 
-	// Se sucesso E está atualizando certificado E tem os IDs necessários, limpa erros antigos
+	// Read body so we can (a) parse certificate dates and (b) still proxy the response.
+	respBytes, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		writeJSONError(w, http.StatusInternalServerError, "erro ao ler resposta da Focus")
+		return
+	}
+
+	// Restore body for proxying
+	resp.Body = io.NopCloser(bytes.NewReader(respBytes))
+
+	// If success and certificate was updated, try to update certificate dates in Supabase
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 && hasCertificateUpdate && companyID != "" {
+		// Extract cert dates (same fields used by CreateEmpresa)
+		var focusResp struct {
+			CertificadoValidoAte string `json:"certificado_valido_ate"`
+			CertificadoValidoDe  string `json:"certificado_valido_de"`
+		}
+		_ = json.Unmarshal(respBytes, &focusResp)
+
+		var expDate *time.Time
+		if focusResp.CertificadoValidoAte != "" {
+			if t, err := time.Parse(time.RFC3339, focusResp.CertificadoValidoAte); err == nil {
+				expDate = &t
+			} else {
+				log.Printf("[focus] warning: failed to parse certificado_valido_ate=%q as RFC3339: %v", focusResp.CertificadoValidoAte, err)
+			}
+		}
+		var effDate *time.Time
+		if focusResp.CertificadoValidoDe != "" {
+			if t, err := time.Parse(time.RFC3339, focusResp.CertificadoValidoDe); err == nil {
+				effDate = &t
+			} else {
+				log.Printf("[focus] warning: failed to parse certificado_valido_de=%q as RFC3339: %v", focusResp.CertificadoValidoDe, err)
+			}
+		}
+
+		if err := supabase.UpdateCertificateDatesForCompany(companyID, effDate, expDate); err != nil {
+			log.Printf("[supabase] update certificates_access dates failed (update flow): %v", err)
+		} else {
+			log.Printf("[supabase] certificate dates updated (update flow) (company_id=%s, effective_date=%v, expiration_date=%v)", companyID, effDate, expDate)
+		}
+	}
+
+	// If success and we have IDs, clean old certificate errors
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 && hasCertificateUpdate && companyID != "" && certificateID != "" {
 		if err := supabase.DeleteFocusIntegrationErrorsByCertificate(companyID, certificateID); err != nil {
 			log.Printf("[supabase] erro ao remover erros antigos do certificado no update: %v", err)

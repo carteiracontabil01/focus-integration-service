@@ -1,7 +1,6 @@
 package supabase
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -51,48 +50,22 @@ func UpdateCertificateDatesForCompany(companyID string, effectiveDate *time.Time
 		return fmt.Errorf("supabase client não inicializado")
 	}
 
-	// Busca 1 certificado associado à empresa (associação via company_certificates_access).
-	body, _, err := c.
-		From("company_certificates_access").
-		Select("certificate_access_id", "", false).
-		Eq("company_id", companyID).
-		Limit(1, "").
-		Execute()
+	// IMPORTANT:
+	// After segmented-schema migration, certificate tables live under `company_private` (not exposed via PostgREST).
+	// So we update via a SECURITY DEFINER RPC callable by service_role:
+	//   public.rpc_service_update_certificate_dates_for_company(company_id, effective_date, expiration_date)
+	payload := map[string]any{
+		"p_company_id": companyID,
+		// allow nulls
+		"p_effective_date":   effectiveDate,
+		"p_expiration_date":  expirationDate,
+	}
+
+	_, err := RpcPublic("rpc_service_update_certificate_dates_for_company", payload)
 	if err != nil {
-		return fmt.Errorf("erro ao buscar certificate_access_id: %w", err)
+		return fmt.Errorf("erro ao atualizar datas do certificado via RPC: %w", err)
 	}
-
-	var rows []struct {
-		CertificateAccessID string `json:"certificate_access_id"`
-	}
-	if err := json.NewDecoder(bytes.NewReader(body)).Decode(&rows); err != nil {
-		return fmt.Errorf("erro ao decodificar certificate_access_id: %w", err)
-	}
-	if len(rows) == 0 || rows[0].CertificateAccessID == "" {
-		return nil // nada para atualizar
-	}
-
-	update := map[string]any{}
-	if expirationDate != nil {
-		update["expiration_date"] = *expirationDate
-	}
-	if effectiveDate != nil {
-		update["effective_date"] = *effectiveDate
-	}
-	// Marca o certificado como ativo após integração bem-sucedida na Focus
-	update["active"] = true
-	
-	if len(update) == 0 {
-		return nil
-	}
-
-	_, _, err = c.
-		From("certificates_access").
-		Update(update, "", "").
-		Eq("id", rows[0].CertificateAccessID).
-		Execute()
-
-	return err
+	return nil
 }
 
 // InsertFocusIntegrationError salva um log de erro da Focus API na tabela focus_integration_errors.

@@ -1,0 +1,13 @@
+# ---- Environment / secrets ----
+.env
+.env.*
+
+# ---- Logs ----
+*.log
+
+# ---- Build artifacts ----
+bin/
+dist/
+tmp/
+
+
